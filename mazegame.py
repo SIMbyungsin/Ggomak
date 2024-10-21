@@ -16,6 +16,34 @@ class Player(FirstPersonController):
             texture = 'marble_bust_01_4k.blend/textures/marble_bust_01_diff_4k.jpg'
         )
 
+class Warp(Entity):
+    def __init__(self, i, j):
+        super().__init__(
+            warp = Entity(
+                model = 'cube',
+                scale = (5, 17, 5),
+                color = color.gray,
+                position = (i * 5, -3, j * 5),
+                collider = 'box',
+                texture = 'marble_bust_01_4k.blend/textures/marble_bust_01_diff_4k.jpg'
+            )
+        )
+        self.a = player
+
+        def update(self):
+            print(player.position)
+            self.abcd()
+
+        def abcd(self): #플레이어와 충돌을 감지하는 함수
+            if self.warp.intersects(self.a):
+                self.a.position = (95, 30, 90)
+        
+        def clear(self):
+            dis = (self.player.position - self.position).length()
+            print(dis)
+            if dis < 3:
+                self.player.position = (95, 3, 90)
+
 class Exit(Entity):
     def __init__(self, i, j):
         super().__init__(
@@ -62,7 +90,7 @@ MAP = [
     [11, 'p' ,13 ,14, __, __, __, 18, __, __, __, 22, 23, 24, __, __, __, __, 29, __, 31, 32, 33],
     [11, __ ,13 ,14, 15, 16, __, 18, __, 20, __, 22, __, __, __, 26, 27, __, 29, __, 31, 32, 33],
     [11, __ ,__ ,__, 15, 16, __, __, __, 20, __, 22, __, 24, __, 26, __, __, 29, __, __, __, 33],
-    [11, 12 ,__ ,14, 15, __, 17, __, 19, 20, __, __, __, 24, 25, 26, 27, __, 29, 30, __, 32, 33],
+    [11, 'w' ,__ ,14, 15, __, 17, __, 19, 20, __, __, __, 24, 25, 26, 27, __, 29, 30, __, 32, 33],
     [11, 12 ,__ ,__, __, __, __, __, 19, 20, __, 22, 23, 24, __, __, 27, __, 29, 30, 'Bust', 32, 33],
     [11, 12 ,'Bust' ,14, 15, 16, 17, 18, 19, 20, 21, __, __, __, __, __, 27, __, 29, 30, 31, 32, 33],
     [11, 12 ,13 ,14, 15, 16, 17, 18, 19, 20, 21, __, 23, 24, 25, __, __, __, 29, 30, 31, 32, 33],
@@ -102,6 +130,10 @@ for i in range(len(MAP)):
             if MAP[i][j] == 'e':
                 exit == Exit(i,j)
                 continue
+            if MAP[i][j] == 'w':
+                warp = Warp(i, j)
+                continue
+            
             
             wall = Entity(
                 model = 'cube',
