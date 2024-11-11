@@ -21,28 +21,18 @@ class Warp(Entity):
         super().__init__(
             warp = Entity(
                 model = 'cube',
-                scale = (5, 17, 5),
+                scale = (5, 15, 5),
                 color = color.gray,
-                position = (i * 5, -3, j * 5),
+                position = (i * 5, -2, j * 5),
                 collider = 'box',
-                texture = 'marble_bust_01_4k.blend/textures/marble_bust_01_diff_4k.jpg'
+                texture = 'brick'
             )
         )
         self.a = player
 
-        def update(self):
-            print(player.position)
-            self.abcd()
-
-        def abcd(self): #플레이어와 충돌을 감지하는 함수
-            if self.warp.intersects(self.a):
-                self.a.position = (95, 30, 90)
-        
-        def clear(self):
-            dis = (self.player.position - self.position).length()
-            print(dis)
-            if dis < 3:
-                self.player.position = (95, 3, 90)
+    def update(self):
+        if self.warp.intersects(self.a):
+            self.a.position = (-3,-3.5, 4)
 
 class Exit(Entity):
     def __init__(self, i, j):
@@ -70,6 +60,22 @@ class Exit(Entity):
              self.player.enabled = False
              self.text.visible = True
 
+class Coin(Entity):
+    def __init__(self, i, j):
+        super().__init__(
+                model = 'circle',
+                color = color.yellow,
+                scale = (1, 1, 1),
+                position = (i * 5, -3.5, j * 5),
+                double_sided = True,
+                collider = 'box'
+
+            )
+    def update(self):
+        self.rotation_y += 1
+        if self.intersects(player):
+            destroy(self)
+
 def input(key):
     if key == 'escape':
         application.quit()
@@ -82,7 +88,7 @@ ground = Entity(
     position = (0, -5, 0),
     scale = (3000, 1, 3000),
     collider = 'mesh',
-    texture = 'metal_plate_4k.blend/textures/metal_plate_disp_4k.png'
+    texture = 'grass'
 )
 
 MAP = [
@@ -92,8 +98,8 @@ MAP = [
     [11, __ ,__ ,__, 15, 16, __, __, __, 20, __, 22, __, 24, __, 26, __, __, 29, __, __, __, 33],
     [11, 'w' ,__ ,14, 15, __, 17, __, 19, 20, __, __, __, 24, 25, 26, 27, __, 29, 30, __, 32, 33],
     [11, 12 ,__ ,__, __, __, __, __, 19, 20, __, 22, 23, 24, __, __, 27, __, 29, 30, 'Bust', 32, 33],
-    [11, 12 ,'Bust' ,14, 15, 16, 17, 18, 19, 20, 21, __, __, __, __, __, 27, __, 29, 30, 31, 32, 33],
-    [11, 12 ,13 ,14, 15, 16, 17, 18, 19, 20, 21, __, 23, 24, 25, __, __, __, 29, 30, 31, 32, 33],
+    [11, 12 ,'Bust' ,14, 15, 'w', 17, 18, 19, 20, 21, __, __, __, __, __, 27, __, 29, 30, 31, 32, 33],
+    [11, 12 ,13 ,14, 15, 16, 17, 18, 'w', 20, 21, __, 23, 24, 25, __, __, __, 29, 30, 31, 32, 33],
     [11, 12 ,__ ,__, __, 16, __, __, __, __, 21, __, 23, 24, 25, __, 27, __, __, 30, 31, 32, 33],
     [11, 12 ,__ ,14, __, __, __, 18, __, 20, 21, __, 23, 'Bust', 25, __, 27, __, __, __, __, 32, 33],
     [11, 12 ,__ ,14, __, 16, __, 18, __, __, __, __, 23, __, 25, __, __, __, 29, 30, __, 32, 33],
@@ -112,37 +118,41 @@ MAP = [
 Bust = Entity(
     model = 'marble_bust_01_4k.fbx',
     texture = 'textures/marble_bust_01_diff_4k.jpg',
-    scale = 0.5,
+    scale = 0.01,
     color = color.gray,
     rotation = (0.100,0),
     position = ('Bust')
-    
-  
 )
+
+walls = []
 
 for i in range(len(MAP)):
     for j in range(len(MAP[i])):
-        if MAP[i][j] :
+        if MAP[i][j]:
             if MAP[i][j] == 'p':
                 print("abc")
                 player.position = (i * 5, 50, j * 5)
                 continue
             if MAP[i][j] == 'e':
-                exit == Exit(i,j)
+                exit = Exit(i, j)
                 continue
             if MAP[i][j] == 'w':
-                warp = Warp(i, j)
+                warpgate = Warp(i, j)  # player 전달 필요 시
                 continue
-            
-            
-            wall = Entity(
-                model = 'cube',
-                color = color.gray,
-                scale = (5, 15, 5),
-                position = (i * 5, -2, j * 5),
-                collider = 'box',
-                texture = 'marble_bust_01_4k.blend/textures/marble_bust_01_diff_4k.jpg'
-                )
 
+            wall = Entity(
+            model = 'cube',
+            color = color.gray,
+            scale = (5, 15, 5),
+            position = (i * 5, -2, j * 5),
+            collider = 'box',
+            texture = 'brick'
+            )
+            walls.append(wall)
+        else:
+            coin = Coin(i, j)
+
+
+Sky(texture = "sky_sunset")
 
 app.run()
